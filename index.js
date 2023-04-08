@@ -45,6 +45,15 @@ async function run() {
     const usersCollection = client
       .db("bootstrap-dashboard")
       .collection("users");
+    const productsCollection = client
+      .db("bootstrap-dashboard")
+      .collection("products");
+    const customersCollection = client
+      .db("bootstrap-dashboard")
+      .collection("customers");
+    const transactionsCollection = client
+      .db("bootstrap-dashboard")
+      .collection("transactions");
 
     // provide jwttoken
     app.put("/user/:email", async (req, res) => {
@@ -57,13 +66,43 @@ async function run() {
         $set: {
           name: name,
           email: email,
+          phoneNumber: "01121245454",
+          role: "user",
         },
       };
-      const result = await usersCollection.updateOne(filter, updateDoc, options);
+      const result = await usersCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
       const token = jwt.sign({ email: email }, process.env.ACCESS_SECRET, {
         expiresIn: "2d",
       });
       res.send({ result, accessToken: token });
+    });
+
+    // get all products
+    app.get("/product", async (req, res) => {
+      const result = await productsCollection.find({}).toArray();
+      res.send(result);
+    });
+
+    // get all customers
+    app.get("/customer", async (req, res) => {
+      const result = await customersCollection.find({}).toArray();
+      res.send(result);
+    });
+
+    // get all transactions
+    app.get("/transaction", async (req, res) => {
+      const result = await transactionsCollection.find({}).toArray();
+      res.send(result);
+    });
+
+    // get all users
+    app.get("/user", async (req, res) => {
+      const result = await usersCollection.find({}).toArray();
+      res.send(result);
     });
   } finally {
     // await client.close()
